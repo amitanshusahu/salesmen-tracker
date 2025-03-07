@@ -94,9 +94,16 @@ export async function getVisitedLocation(
     if (!user) {
       return res.status(400).json({ msg: "salesman doesn't exists" });
     }
+    const today = new Date();
+    const startofDay = new Date(today.setHours(0, 0, 0, 0));
+    const endofDay = new Date(today.setHours(23, 59, 59, 999));
     const visitedLocation = await Prisma.visitedLocation.findMany({
       where: {
-        salesManId: user.id
+        salesManId: user.id,
+        date:{
+          gte: startofDay,
+          lte: endofDay
+        }
       },
       include: {
         Location: {
