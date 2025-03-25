@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,9 +14,69 @@ model Manager {
   password         String
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
-  User             SalesMan[]
-  ManagedLocations ManagedLocation[]
   AssignSalesman   AssignSalesman[]
+  ManagedLocations ManagedLocation[]
+  User             SalesMan[]
+}
+
+model SalesMan {
+  id               Int               @id @default(autoincrement())
+  name             String
+  uid              String            @unique
+  phone            String?
+  canLogin         Boolean           @default(true)
+  salesManType     SalesManType
+  managerId        Int
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  AssignSalesman   AssignSalesman[]
+  Manager          Manager           @relation(fields: [managerId], references: [id], onDelete: Cascade)
+  visitedLocations VisitedLocation[]
+}
+
+model ManagedLocation {
+  id              Int               @id @default(autoincrement())
+  name            String
+  market_name     String
+  address         String
+  latitude        Float
+  longitude       Float
+  region          String
+  state           String
+  storeType       StoreType
+  managerId       Int
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  AssignSalesman  AssignSalesman[]
+  Manager         Manager           @relation(fields: [managerId], references: [id], onDelete: Cascade)
+  VisitedLocation VisitedLocation[]
+}
+
+model VisitedLocation {
+  id            Int             @id @default(autoincrement())
+  date          DateTime
+  locationId    Int
+  UserLatitude  Float
+  UserLongitude Float
+  scanDistance  Float
+  visitCount    Int             @default(0)
+  salesManId    Int
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  Location      ManagedLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  SalesMan      SalesMan        @relation(fields: [salesManId], references: [id], onDelete: Cascade)
+}
+
+model AssignSalesman {
+  id         Int             @id @default(autoincrement())
+  managerId  Int
+  salesManId Int
+  locationId Int
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  Location   ManagedLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  Manager    Manager         @relation(fields: [managerId], references: [id], onDelete: Cascade)
+  SalesMan   SalesMan        @relation(fields: [salesManId], references: [id], onDelete: Cascade)
 }
 
 enum SalesManType {
@@ -30,78 +84,14 @@ enum SalesManType {
   PRESELLER
   MERCHANDISER
   DILIVERY
-}
-
-model SalesMan {
-  id           Int          @id @default(autoincrement())
-  name         String
-  uid          String       @unique
-  phone        String?
-  canLogin     Boolean      @default(true)
-  salesManType SalesManType
-
-  managerId Int
-  Manager   Manager @relation(fields: [managerId], references: [id], onDelete: Cascade)
-
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  visitedLocations VisitedLocation[]
-  AssignSalesman   AssignSalesman[]
+  CITYHEAD    @map("CITY HEAD")
+  SUPERVISOR
 }
 
 enum StoreType {
   RETAILER
   DISTRIBUTOR
   WHOLESALER
-}
-
-model ManagedLocation {
-  id          Int       @id @default(autoincrement())
-  name        String
-  market_name String
-  address     String
-  latitude    Float
-  longitude   Float
-  region      String
-  state       String
-  storeType   StoreType
-
-  managerId Int
-  Manager   Manager @relation(fields: [managerId], references: [id], onDelete: Cascade)
-
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  VisitedLocation VisitedLocation[]
-  AssignSalesman  AssignSalesman[]
-}
-
-model VisitedLocation {
-  id            Int             @id @default(autoincrement())
-  date          DateTime
-  locationId    Int
-  Location      ManagedLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  UserLatitude  Float
-  UserLongitude Float
-  scanDistance  Float
-  visitCount    Int             @default(0)
-
-  salesManId Int
-  SalesMan   SalesMan @relation(fields: [salesManId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model AssignSalesman {
-  id        Int     @id @default(autoincrement())
-  managerId Int
-  Manager   Manager @relation(fields: [managerId], references: [id], onDelete: Cascade)
-
-  salesManId Int
-  SalesMan   SalesMan        @relation(fields: [salesManId], references: [id], onDelete: Cascade)
-  locationId Int
-  Location   ManagedLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  MEGA    @map("MEGA SUB")
+  SUB
 }
