@@ -7,7 +7,7 @@ export async function createLocation(
 ): Promise<Response> {
   try {
     const { name, marketName, address, latitude, longitude, uid, region, state, storeType } = req.body;
-    console.log({ name, address, latitude, longitude, uid })
+    console.log({ name, address, latitude, longitude, uid, storeType });
 
     //get manager id
     const manager = await Prisma.manager.findUnique({

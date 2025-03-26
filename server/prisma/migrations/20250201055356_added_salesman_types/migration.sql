@@ -1,2 +1,7 @@
 -- AlterEnum
 ALTER TYPE "SalesManType" ADD VALUE 'DILIVERY';
+
+ALTER TYPE "SalesManType" ADD VALUE 'CITY HEAD';
+
+ALTER TYPE "StoreType" ADD VALUE 'MEGA SUB';
+
