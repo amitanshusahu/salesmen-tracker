@@ -9,6 +9,7 @@ export async function managerSignup(
 ): Promise<Response> {
   try {
     const { name, email, password } = req.body;
+    console.log(name, email, password);
     const user = await Prisma.manager.findUnique({
       where: {
         email: email,
